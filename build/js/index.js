@@ -50,23 +50,24 @@ function createHtml() {
 			$(".container .task-item").addClass("flag");
 			console.log(i);
 		}
+		clock($item);
 	}
 	//鼠标经过特效
-	// mouseOn();
+	mouseOn();
 	deleteItem();
 	getIndex();// 获取删除内容index
 	eventComplated(); //完成事件
 }
 
-//鼠标讲过特效
-// function mouseOn() {
-// 	$(".container form input").eq(1).hover(function () {
-// 		$(this).css("background","#46b8e4");
-// 	});
-// 	$(".container .task-item").hover(function ()  {
-// 		$(this).css("background","#46b8e4");
-// 	})
-// }
+// 鼠标讲过特效
+function mouseOn() {
+	$(".container form input").eq(1).mouseover(function () {
+		$(this).css("background","#46b8e4");
+	});
+	$(".container form input").eq(1).mouseout(function () {
+		$(this).css("background","#46b1e4");
+	});
+}
 	
 
 //绑定html
@@ -133,9 +134,11 @@ function add_task_detail(data) {
 					'</div>'+
 				'</div>'+
 			'<div class="remind input-item">'+
-			'<label>提醒时间</label><input class="datetime" name="remind_date" type="date" value="'+(data.time || "")+'"></div>'+
+			'<label>提醒时间</label><input class="datetime" name="remind_date" type="text" value="'+(data.time || "")+'"></div>'+
 			'<div class="input-item"><button type="submit">更新</button></div></form></div>';
 	$(".container .task-list").after(str);
+	$.datetimepicker.setLocale('ch');
+	$(".datetime").datetimepicker();
 	removeDetail();
 	
 }
@@ -203,6 +206,50 @@ function eventComplated() {
 		}
 		createHtml();
 	});
+}
+console.log(1);
+//闹钟
+var timer = null;
+
+function clock(obj) {
+	console.log(obj.timer);
+	clearInterval(timer);
+	obj.timer = setInterval(function () {
+		//获取当前时间
+		var index = obj.data("index");
+		var start_time = new Date().getTime();
+		if (task_list[index].complated || !task_list[index].time) {
+			clearInterval(obj.timer);
+			return false;
+		};
+		var end_time = (new Date(task_list[index].time)).getTime();
+		if(end_time - start_time <= 1) {
+			clearInterval(obj.timer);
+			//播放音乐
+			
+			//弹出提醒框
+			tip(index);
+		}
+	},1000);
+}
+
+//提醒框
+function tip(index) {
+	if($(".clock-tip")[0] || task_list[index].off) return;
+	var tipDiv = "";
+	tipDiv = '<div class="clock-tip">'+task_list[index].content+'&nbsp<span>知道了</span></div>';
+	$(".container").before(tipDiv);
+	$(".clock-tip span").click(function() {
+		$(".clock-tip").remove();
+		fixdetail(index,{off:true});
+	})
+	play_miusic();
+	
+}
+//播放音乐
+function play_miusic() {
+	$("#music")[0].play();
+	console.log($("#music"));
 }
 
 }()); 

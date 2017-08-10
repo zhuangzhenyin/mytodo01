@@ -47,9 +47,14 @@ gulp.task("lib",function () {
 		.pipe(gulp.dest("build/lib/"))
 		.pipe(gulp.dest("dev/lib/"));
 });
-
+//音乐播放
+gulp.task("miusic",function () {
+	gulp.src("src/*.mp3")
+		.pipe(gulp.dest("build/"))
+		.pipe(gulp.dest("dev/"));
+});
 //总任务
-gulp.task("build",["html","css","js","img","lib"]);
+gulp.task("build",["html","css","js","img","lib","miusic"]);
 
 //清除
 gulp.task("clear",function () {
